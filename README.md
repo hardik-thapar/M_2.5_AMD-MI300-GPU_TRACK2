@@ -1,5 +1,6 @@
 # AI Scheduling Assistant
 
+[![AI Scheduling Demo](https://i.postimg.cc/LXBjXZhF/temp-Image4-DNir5.avif)](https://postimg.cc/G8t4gtkX)
 ## Overview
 
 This repository contains our submission for the **Agentic AI Scheduling Assistant Hackathon** organized by AMD at IIT Bombay. The challenge was to build an AI-powered assistant capable of autonomously managing scheduling tasks — including understanding user requests, coordinating with calendars, and proposing optimal meeting times with minimal human input.
