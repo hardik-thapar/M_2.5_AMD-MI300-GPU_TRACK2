@@ -1,97 +1,145 @@
-# AI Scheduling Assistant
+# AI-Scheduling-Assistant
 
-![AI Scheduling Assistant Demo](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWtleXd4bGo0aGFtc2VwMmV1cGJ2cGVmcjlxeGRzNmJ6dHVkcXhzeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2qHveX89Y6ANt9cImN/giphy.gif)
-## Overview
+### Introduction 
 
-This repository contains our submission for the **Agentic AI Scheduling Assistant Hackathon** organized by AMD at IIT Bombay. The challenge was to build an AI-powered assistant capable of autonomously managing scheduling tasks — including understanding user requests, coordinating with calendars, and proposing optimal meeting times with minimal human input.
+#### Overview:
+Welcome to the Agentic AI Scheduling Assistant Hackathon! This challenge invites developers, AI enthusiasts, and innovators to build an intelligent scheduling system that leverages Agentic AI - a next-generation approach where AI acts autonomously to achieve complex goals. 
 
-## Why Agentic AI?
+Your mission: Create an AI assistant that eliminates the back-and-forth of meeting coordination by autonomously scheduling, rescheduling, and optimizing calendars.
 
-Traditional scheduling tools require a lot of back-and-forth or predefined rules. Our solution uses Agentic AI principles to build an assistant that:
+#### Why Agentic AI? 
+Traditional scheduling tools rely on rule-based automation or human input. Your solution should go further by: 
+- Reasoning like a human assistant (e.g., prioritizing attendees, resolving conflicts).
+- Acting independently (e.g., sending follow-ups, adjusting for time zones).
+- Learning from user preferences (e.g., preferred times, recurring meetings). 
 
-- Understands natural language input (e.g., "Schedule a meeting next Thursday at 2 PM")
-- Resolves calendar conflicts and adjusts for time zones
-- Learns preferences over time
-- Acts autonomously to handle changes, send reminders, and follow up
+#### Key Features to Consider:
+##### Your solution should aim to include: <br>
+✅ Autonomous Coordination: The AI initiates scheduling without human micromanagement. <br>
+✅ Dynamic Adaptability: Handles last-minute changes or conflicting priorities. <br>
+✅ Natural Language Interaction: Users may converse with the AI (e.g., “Schedule a meeting on Tuesday”).  <br>
+✅	Calendar Integration: Syncs with Google Calendar <br>
 
-## Features
+#### Success Metrics: 
+#### A winning solution will excel in: <br>
+✅ Autonomy: Minimal human intervention needed.  <br>
+✅ Accuracy: Few scheduling errors or conflicts. <br>
+✅ User Experience: Intuitive and time-saving. <br>
 
-- Autonomous meeting coordination with minimal user input  
-- Integration with Google Calendar API  
-- Natural language processing via LLMs (DeepSeek 7B, LLaMA 3.1)  
-- vLLM for high-performance inference on MI300 GPUs  
-- JSON-based input/output for seamless system integration  
+#### Setup & Requirements:
+- Tools/APIs Needed: LLM ( vLLM server running on MI300 GPU). 
+- Calendar APIs (Google Calendar). 
+- Framework – May use License free tools & packages 
+- Development Environment: Python
 
-## Setup Instructions
+----------------
 
-### Clone and prepare the environment
+### To access MI300 Instance, follow the steps as mentioned below :
 
-```bash
+<img width="809" height="857" alt="{E739B41B-9914-45A1-8413-778E28C7F3E6}" src="https://github.com/user-attachments/assets/3b9d68c7-f994-486b-8734-ff61648bb192" />
+
+
+----------------
+
+### Prerequisite : 
+
+##### Run the below command in your Notebook Terminal to update the scripts. 
+```
 git clone https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant.git
 cp -r AI-Scheduling-Assistant/* ./
 ```
+-------------
 
-### MI300 GPU Setup
+### Extracting Google Calendar Events :
+#### The Notebook demonstrates how to programmatically retrieve and process Google Calendar events for a given user and date range.
+#### You will be provided with Google Auth Tokens to pull Google Calendar Events.
 
-Follow the MI300 setup instructions as shown in the provided image:
+##### Key Steps:
+- Authentication: Load user credentials from a token file.
+- API Call: Fetch events between specified start/end dates using the Google Calendar API.
+- Data Processing: Extract event details (start/end times, attendees) and structure them into a clean format.
+- Output: Return a list of events with attendee counts and time slots.
 
-![MI300 GPU Setup](https://github.com/user-attachments/assets/3b9d68c7-f994-486b-8734-ff61648bb192)
+#### Follow the notebook for example usage : [Calendar_Event_Extraction](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/Calendar_Event_Extraction.ipynb)
 
-### Calendar Event Extraction
+----------------
 
-Google Calendar events are extracted using authentication tokens provided during the hackathon. The notebook includes:
+### Setting-Up vLLM Server with Large Language Models : 
 
-- Authentication flow  
-- API requests to fetch events  
-- Data transformation into clean JSON structure  
+vLLM is an open-source library designed to deliver high throughput and low latency for large language model (LLM) inference. It optimizes text generation workloads by efficiently batching requests and making full use of GPU resources, empowering developers to manage complex tasks like code generation and large-scale conversational AI.
 
-Refer to the notebook: [`Calendar_Event_Extraction.ipynb`](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/Calendar_Event_Extraction.ipynb)
+#### Start the vLLM server with DeepSeek LLM 7B Chat Model
 
-## Running the vLLM Server
-
-### DeepSeek LLM 7B Chat
+Open a new tab in this Jypyter server, click on the terminal icon to open a new terminal, then copy the following command to launch the vLLM server:
 
 ```bash
 HIP_VISIBLE_DEVICES=0 vllm serve /home/user/Models/deepseek-ai/deepseek-llm-7b-chat \
-  --gpu-memory-utilization 0.9 \
-  --swap-space 16 \
-  --disable-log-requests \
-  --dtype float16 \
-  --max-model-len 2048 \
-  --tensor-parallel-size 1 \
-  --host 0.0.0.0 \
-  --port 3000
+        --gpu-memory-utilization 0.9 \
+        --swap-space 16 \
+        --disable-log-requests \
+        --dtype float16 \
+        --max-model-len 2048 \
+        --tensor-parallel-size 1 \
+        --host 0.0.0.0 \
+        --port 3000 \
+        --num-scheduler-steps 10 \
+        --max-num-seqs 128 \
+        --max-num-batched-tokens 2048 \
+        --max-model-len 2048 \
+        --distributed-executor-backend "mp"
 ```
+#### For setting up vLLM server with DeepSeek Model & usage, please follow : [vLLM_Inference_Servering_DeepSeek](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/vLLM_Inference_Servering_DeepSeek.ipynb)
 
-### Meta LLaMA 3.1 8B Instruct
+#### Start the vLLM server with Meta-Llama-3.1-8B-Instruct Model
+
+Open a new tab in this Jypyter server, click on the terminal icon to open a new terminal, then copy the following command to launch the vLLM server:
 
 ```bash
 HIP_VISIBLE_DEVICES=0 vllm serve /home/user/Models/meta-llama/Meta-Llama-3.1-8B-Instruct \
-  --gpu-memory-utilization 0.3 \
-  --swap-space 16 \
-  --disable-log-requests \
-  --dtype float16 \
-  --max-model-len 2048 \
-  --tensor-parallel-size 1 \
-  --host 0.0.0.0 \
-  --port 4000
+        --gpu-memory-utilization 0.3 \
+        --swap-space 16 \
+        --disable-log-requests \
+        --dtype float16 \
+        --max-model-len 2048 \
+        --tensor-parallel-size 1 \
+        --host 0.0.0.0 \
+        --port 4000 \
+        --num-scheduler-steps 10 \
+        --max-num-seqs 128 \
+        --max-num-batched-tokens 2048 \
+        --max-model-len 2048 \
+        --distributed-executor-backend "mp"
 ```
 
-See more in:  
-- [`vLLM_Inference_Servering_DeepSeek.ipynb`](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/vLLM_Inference_Servering_DeepSeek.ipynb)  
-- [`vLLM_Inference_Servering_LLaMA.ipynb`](https://gitenterprise.xilinx.com/asirra/AI-Scheduling-Assistant/blob/main/vLLM_Inference_Servering_LLaMA.ipynb)
+#### For setting up vLLM server with LLama Model & usage, please follow : [vLLM_Inference_Servering_LLaMA](https://gitenterprise.xilinx.com/asirra/AI-Scheduling-Assistant/blob/main/vLLM_Inference_Servering_LLaMA.ipynb)
+----------------
 
-## AI Agent Design
+### Setting-Up AI Agent :
 
-Our AI agent is designed to parse natural language emails and extract structured scheduling information. It uses LLM prompts with clear instructions to extract:
 
-- Participants' emails  
-- Meeting duration  
-- Time constraints  
+#### Start the vLLM server with DeepSeek Model
 
-### Sample Agent Snippet
+Open a new tab in this Jypyter server, click on the terminal icon to open a new terminal, then copy the following command to launch the vLLM server:
 
-```python
+```bash
+HIP_VISIBLE_DEVICES=0 vllm serve /home/user/Models/deepseek-ai/deepseek-llm-7b-chat \
+        --gpu-memory-utilization 0.9 \
+        --swap-space 16 \
+        --disable-log-requests \
+        --dtype float16 \
+        --max-model-len 2048 \
+        --tensor-parallel-size 1 \
+        --host 0.0.0.0 \
+        --port 3000 \
+        --num-scheduler-steps 10 \
+        --max-num-seqs 128 \
+        --max-num-batched-tokens 2048 \
+        --max-model-len 2048 \
+        --distributed-executor-backend "mp"
+```
+
+#### Sample AI Agent that parse Email Input & Output the Processed JSON
+```
 class AI_AGENT:
     def __init__(self, client, MODEL_PATH):
         self.base_url = BASE_URL
@@ -104,76 +152,173 @@ class AI_AGENT:
             messages=[{
                 "role": "user",
                 "content": f"""
-                You are an AI scheduling agent. Extract:
-                - Email IDs of participants
-                - Meeting duration in minutes
-                - Time constraints (e.g., next week)
-
-                Format the output strictly as JSON.
+                Yor are an Agent that helps in scheduling meetings.
+                Your job is to extracts Email ID's and Meeting Duration.
+                You should return :
+                1. List of email id's of participants (comma-separated).
+                2. Meeting duration in minutes.
+                3. Time constraints (e.g., 'next week').
+                If the List of email id's of participants are just names, then append @amd.com at the end and return. 
+                Return as json with 'participants', 'time_constraints' & 'meeting_duration'.
+                Stricty follow the instructions. Strictly return dict with participents email id's, time constraints & meeting duration in minutes only. 
+                Don not add any other instrctions or information. 
+                
                 Email: {email_text}
+                
                 """
             }]
         )
         return json.loads(response.choices[0].message.content)
 ```
 
-Notebook: [`Sample_AI_Agent.ipynb`](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/Sample_AI_Agent.ipynb)
 
-## Input/Output Format
+#### Follow the Notebook for setting-up an example AI Agent : [Sample_AI_Agent](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/Sample_AI_Agent.ipynb)
 
-### Input JSON
+The Notebook demonstrates how to create a simple AI Agent that uses vLLM & OpenAI API to communicate with LLM Model.
 
-```json
+----------------
+
+### Inputs & Outputs : 
+#### Input JSON : 
+
+The input to your code will be in JSON format in the below structure. 
+```
 {
-  "Request_id": "6118b54f-907b-4451-8d48-dd13d76033a5",
-  "Datetime": "09-07-2025T12:34:55",
-  "Location": "IIT Mumbai",
-  "From": "userone.amd@gmail.com",
-  "Attendees": [
-    { "email": "usertwo.amd@gmail.com" },
-    { "email": "userthree.amd@gmail.com" }
-  ],
-  "Subject": "Agentic AI Project Status Update",
-  "EmailContent": "Hi team, let's meet on Thursday for 30 minutes to discuss the status of Agentic AI Project."
+    "Request_id": "6118b54f-907b-4451-8d48-dd13d76033a5",
+    "Datetime": "09-07-2025T12:34:55",
+    "Location": "IIT Mumbai",
+    "From": "userone.amd@gmail.com",
+    "Attendees": [
+        {
+            "email": "usertwo.amd@gmail.com"
+        },
+        {
+            "email": "userthree.amd@gmail.com"
+        }
+    ],
+    "Subject": "Agentic AI Project Status Update",
+    "EmailContent": "Hi team, let's meet on Thursday for 30 minutes to discuss the status of Agentic AI Project."
 }
 ```
 
-### Output JSON
-
-```json
+#### Final Output JSON : 
+Your Final Output JSON should follow below structure.  <br>
+##### Note : This output will be graded for quallifying & scoring. 
+```
 {
-  "EventStart": "2025-07-17T10:30:00+05:30",
-  "EventEnd": "2025-07-17T11:00:00+05:30",
-  "Duration_mins": "30",
-  "Attendees": [...],
-  "Subject": "...",
-  "MetaData": {}
+    "Request_id": "6118b54f-907b-4451-8d48-dd13d76033a5",
+    "Datetime": "09-07-2025T12:34:55",
+    "Location": "IIT Mumbai",
+    "From": "userone.amd@gmail.com",
+    "Attendees": [
+        {
+            "email": "userone.amd@gmail.com",
+            "events": [
+                {
+                    "StartTime": "2025-07-17T10:30:00+05:30",
+                    "EndTime": "2025-07-17T11:00:00+05:30",
+                    "NumAttendees": 3,
+                    "Attendees": [
+                        "userone.amd@gmail.com",
+                        "usertwo.amd@gmail.com",
+                        "userthree.amd@gmail.com"
+                    ],
+                    "Summary": "Agentic AI Project Status Update"
+                }
+            ]
+        },
+        {
+            "email": "usertwo.amd@gmail.com",
+            "events": [
+                {
+                    "StartTime": "2025-07-17T10:00:00+05:30",
+                    "EndTime": "2025-07-17T10:30:00+05:30",
+                    "NumAttendees": 3,
+                    "Attendees": [
+                        "userone.amd@gmail.com",
+                        "usertwo.amd@gmail.com",
+                        "userthree.amd@gmail.com"
+                    ],
+                    "Summary": "Team Meet"
+                },
+                {
+                    "StartTime": "2025-07-17T10:30:00+05:30",
+                    "EndTime": "2025-07-17T11:00:00+05:30",
+                    "NumAttendees": 3,
+                    "Attendees": [
+                        "userone.amd@gmail.com",
+                        "usertwo.amd@gmail.com",
+                        "userthree.amd@gmail.com"
+                    ],
+                    "Summary": "Agentic AI Project Status Update"
+                }
+            ]
+        },
+        {
+            "email": "userthree.amd@gmail.com",
+            "events": [
+                {
+                    "StartTime": "2025-07-17T10:00:00+05:30",
+                    "EndTime": "2025-07-17T10:30:00+05:30",
+                    "NumAttendees": 3,
+                    "Attendees": [
+                        "userone.amd@gmail.com",
+                        "usertwo.amd@gmail.com",
+                        "userthree.amd@gmail.com"
+                    ],
+                    "Summary": "Team Meet"
+                },
+                {
+                    "StartTime": "2025-07-17T13:00:00+05:30",
+                    "EndTime": "2025-07-17T14:00:00+05:30",
+                    "NumAttendees": 1,
+                    "Attendees": [
+                        "SELF"
+                    ],
+                    "Summary": "Lunch with Customers"
+                },
+                {
+                    "StartTime": "2025-07-17T10:30:00+05:30",
+                    "EndTime": "2025-07-17T11:00:00+05:30",
+                    "NumAttendees": 3,
+                    "Attendees": [
+                        "userone.amd@gmail.com",
+                        "usertwo.amd@gmail.com",
+                        "userthree.amd@gmail.com"
+                    ],
+                    "Summary": "Agentic AI Project Status Update"
+                }
+            ]
+        }
+    ],
+    "Subject": "Agentic AI Project Status Update",
+    "EmailContent": "Hi team, let's meet on Thursday for 30 minutes to discuss the status of Agentic AI Project.",
+    "EventStart": "2025-07-17T10:30:00+05:30",
+    "EventEnd": "2025-07-17T11:00:00+05:30",
+    "Duration_mins": "30",
+    "MetaData": {}
 }
 ```
+---------
+### Submission :
 
-## Submission Guide
+#### Please follow : [Submission Notebook](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/Submission.ipynb)
+##### ```def your_meeting_assistant( )``` takes Meeting request JSON as Input
+##### ```your_meeting_assistant( )``` returns with two New Fields : 
+- processed 
+- output
+#### At the end of the Hackathon time ( at 2:00 P.M), you must execute this code
+#### We will send JSONs at Port 5000 & will receive your AI Assistant Response
+#### Make sure that your Output strictly follows the specified format. 
 
-Final submission should be made by executing the following function in the submission notebook:
+---------
 
-```python
-def your_meeting_assistant(input_json):
-    # your implementation
-    return {
-        "processed": True,
-        "output": {...}
-    }
-```
+### Evaluation Criteria for Scoring & Ranking :
+- Correctness of Output – Accuracy and precision of the results 
+- Roundtrip Latency – Speed and efficiency of processing and response 
+- Maintenance of GitHub Repository – Code organization, documentation, and commit hygiene 
+- Creativeness in Approach – Innovation, originality, and problem-solving uniqueness 
+- Scoring Based on Performance – Combined assessment of correctness, latency, repo quality, and creativity 
+- Ranking Methodology – Comparative evaluation to determine the best-performing solution
 
-Notebook: [`Submission.ipynb`](https://github.com/AMD-AI-HACKATHON/AI-Scheduling-Assistant/blob/main/Submission.ipynb)
 
-## Evaluation Criteria
-
-- Accuracy of final output JSON  
-- Response time (latency)  
-- Code readability and repo structure  
-- Creativity in design and approach  
-- End-to-end working system  
-
----
-
-**Note**: This project is developed as part of the AMD AI Sprint Hackathon 2025. The assistant runs on MI300 GPU-backed infrastructure and demonstrates the power of agentic AI in real-world scheduling workflows.
